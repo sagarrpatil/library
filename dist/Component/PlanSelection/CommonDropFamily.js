@@ -34,13 +34,13 @@ function CommonDropFamily(_ref) {
       setSelectedValue(list[0].category); // Default to the first category if no selected family
     }
   }, [selectedIndex, selectedFamily, list]);
-  return /*#__PURE__*/React.createElement(_material.FormControl, {
+  return /*#__PURE__*/_react.React.createElement(_material.FormControl, {
     sx: {
       m: 1,
       width: 200
     },
     size: "small"
-  }, /*#__PURE__*/React.createElement(_material.Select, {
+  }, /*#__PURE__*/_react.React.createElement(_material.Select, {
     value: selectedFamily || selectedValue // Use selectedFamily if available, otherwise fallback to local state
     ,
     style: {
@@ -51,7 +51,7 @@ function CommonDropFamily(_ref) {
     disabled: disabled // Disable if the props.disabled is true
     ,
     onChange: handleChange // Trigger handleChange when selection changes
-  }, list.map((row, idx) => /*#__PURE__*/React.createElement(_material.MenuItem, {
+  }, list.map((row, idx) => /*#__PURE__*/_react.React.createElement(_material.MenuItem, {
     key: idx,
     value: row.category
   }, row.category))));

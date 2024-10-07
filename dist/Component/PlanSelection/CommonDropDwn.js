@@ -32,13 +32,13 @@ function CommonDropDwn(_ref) {
       setSelectedValue(list[0].amount); // Set initial value to the first item's amount
     }
   }, [list]);
-  return /*#__PURE__*/React.createElement(_material.FormControl, {
+  return /*#__PURE__*/_react.React.createElement(_material.FormControl, {
     sx: {
       m: 1,
       width: 200
     },
     size: "small"
-  }, /*#__PURE__*/React.createElement(_material.Select, {
+  }, /*#__PURE__*/_react.React.createElement(_material.Select, {
     value: selectedIndex ? selectedEnrollFee : selectedValue // Use selectedEnrollFee if it's selected
     ,
     style: {
@@ -50,7 +50,7 @@ function CommonDropDwn(_ref) {
     disabled: disabled // Disable if props.disabled is true
     ,
     onChange: handleChange // Trigger the handleChange function on selection
-  }, list.map((row, idx) => /*#__PURE__*/React.createElement(_material.MenuItem, {
+  }, list.map((row, idx) => /*#__PURE__*/_react.React.createElement(_material.MenuItem, {
     key: idx,
     value: row.amount
   }, "Enrollment Fee - $", row.amount))));
