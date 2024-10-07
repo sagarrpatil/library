@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+      "declaration": true,
+      "emitDeclarationOnly": true,
+      "outDir": "dist",
+      "jsx": "react",
+      "module": "ESNext",
+      "target": "ES6",
+      "moduleResolution": "node"
+    },
+    "include": ["src/**/*"],
+    "exclude": ["dist"]
+  }
+  
