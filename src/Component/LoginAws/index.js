@@ -1,11 +1,7 @@
 import * as React from "react";
-import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { Container, Grid, Paper } from "@mui/material";
-import "./index.css";
+import { Grid, Paper } from "@mui/material";
 import { Amplify } from "aws-amplify";
 import { defaultStorage } from "aws-amplify/utils";
 import { cognitoUserPoolsTokenProvider } from "aws-amplify/auth/cognito";
@@ -58,14 +54,14 @@ export default function LoginAws({
               <img src={logoImage} style={{ width: "70%" }} />
             </Grid>
             <Grid item xs={12} style={{ background: cardBgColor, padding: 20 }}>
-              {error && <p class="a-errorMessage">{error}</p>}
+              {error && <p style={style.errorMessage}>{error}</p>}
               <form onSubmit={(e) => signInMethod(e)}>
-                <h4 className="label-head-login">
+                <h4 style={style.labelHeadLogin}>
                   Sign in with your email and password
                 </h4>
                 <p style={{ margin: 0 }}>Email</p>
                 <input
-                  class="a-input"
+                style={style.input}
                   type="text"
                   placeholder="Enter Email"
                   value={username}
@@ -76,7 +72,7 @@ export default function LoginAws({
 
                 <p style={{ margin: 0, paddingTop: 10 }}>Password</p>
                 <input
-                  class="a-input"
+                    style={style.input}
                   type="password"
                   placeholder="Enter Password"
                   value={password}
@@ -84,7 +80,7 @@ export default function LoginAws({
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <span class="forgot-pawd">Forgot your password?</span>
+                <span style={style.forgotPassword}>Forgot your password?</span>
                 <Button
                   type="submit"
                   style={{ backgroundColor: buttonBg, ...style.buttonStyle }}
@@ -138,5 +134,37 @@ const style = {
     bottom: 0,
     right: 0,
     left: 0,
+  },
+  labelHeadLogin: {
+    fontSize: "16px",
+    color: "#000",
+    fontWeight: 400,
+  },
+  input: {
+    width: "90%",
+    height: "30px",
+    borderRadius: "5px",
+    padding: "2px 12px",
+    marginTop: "3px",
+    fontSize: "14px",
+    boxShadow: "inset 0 1px 1px rgba(0, 0, 0, 0.075)",
+    transition: "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
+    lineHeight: 1.42857,
+  },
+  forgotPassword: {
+    color: "#337ab7",
+    cursor: "pointer",
+    marginTop: "10px",
+    display: "block",
+    paddingTop: "5px",
+  },
+  errorMessage: {
+    padding: "5px",
+    fontSize: "14px",
+    background: "#f5f5f5",
+    border: "2px solid #d64958",
+    color: "#d64958",
+    marginBottom: "10px",
+    fontWeight: 400,
   },
 };
