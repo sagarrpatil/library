@@ -383,15 +383,6 @@ const App = () => {
     fontWeight: "bold",
     color: "#009cde"
   };
-  return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_LoginAws.default, {
-    cardBgColor: "#EAE8DB",
-    buttonBg: "red",
-    userPool: {
-      userPoolId: "us-east-2_RnB2tB4Mi",
-      userPoolClientId: "3egloes1kenj79sumvajd9ep68"
-    },
-    onSuccessAction: obj => console.log(obj),
-    logoImage: "https://dev.csr.universalhealthfellowship.org/static/media/csr-portal.aa62843a.jpg"
-  }));
+  return /*#__PURE__*/_react.default.createElement("div", null);
 };
 _reactDom.default.render(/*#__PURE__*/_react.default.createElement(App, null), document.getElementById("root"));

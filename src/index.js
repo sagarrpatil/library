@@ -412,18 +412,7 @@ const App = () => {
 
   return (
     <div>
-      <LoginAws
-        cardBgColor={"#EAE8DB"}
-        buttonBg={"red"}
-        userPool={{
-          userPoolId: "us-east-2_RnB2tB4Mi",
-          userPoolClientId: "3egloes1kenj79sumvajd9ep68",
-        }}
-        onSuccessAction={(obj) => console.log(obj)}
-        logoImage={
-          "https://dev.csr.universalhealthfellowship.org/static/media/csr-portal.aa62843a.jpg"
-        }
-      />
+     
     </div>
   );
 };
