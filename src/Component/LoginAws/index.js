@@ -5,8 +5,9 @@ import { Grid, Paper } from "@mui/material";
 import { Amplify } from "aws-amplify";
 import { defaultStorage } from "aws-amplify/utils";
 import { cognitoUserPoolsTokenProvider } from "aws-amplify/auth/cognito";
-import { signIn } from "aws-amplify/auth";
+import { signIn, resetPassword, confirmResetPassword } from "aws-amplify/auth";
 import CircularProgress from "@mui/material/CircularProgress";
+import PasswordValidations from "./PwdValidations";
 
 export default function LoginAws({
   logoImage,
@@ -24,11 +25,16 @@ export default function LoginAws({
   });
 
   cognitoUserPoolsTokenProvider.setKeyValueStorage(defaultStorage);
-
+  const [screen, setScreen] = React.useState("Login");
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState(null);
   const [loading, setLoader] = React.useState(false);
+  const [code, setCode] = React.useState("");
+  const [newPassword, setNewPassword] = React.useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = React.useState("");
+  const [disableSendBtn, setDisableSendBtn] = React.useState(true);
+  const [message, setMessage] = React.useState("");
   async function signInMethod(e) {
     e?.preventDefault?.();
     setLoader(true);
@@ -42,9 +48,62 @@ export default function LoginAws({
       setLoader(false);
     }
   }
+  async function resetPasswordMethod(e) {
+    e?.preventDefault?.();
+    setLoader(true);
+    try {
+      const output = await resetPassword({
+        username: username,
+      });
+      const { nextStep } = output;
+      switch (nextStep.resetPasswordStep) {
+        case "CONFIRM_RESET_PASSWORD_WITH_CODE":
+          const codeDeliveryDetails = nextStep.codeDeliveryDetails;
+          setScreen("OtpVerification");
+          setMessage(
+            `Confirmation code was sent to ${codeDeliveryDetails.deliveryMedium}`,
+          );
+          break;
+        case "DONE":
+          console.log("Successfully reset password.");
+          break;
+      }
+      setLoader(false);
+    } catch (error) {
+      setError(String(error));
+      setLoader(false);
+    }
+  }
+  const handleConfirmVerification = async (e) => {
+    e?.preventDefault?.();
+    setLoader(true);
+    if (newPassword.trim() === confirmNewPassword.trim()) {
+      try {
+        setLoader(false);
+        await confirmResetPassword({
+          username: username,
+          confirmationCode: code,
+          newPassword: newPassword.trim(),
+        });
+        setScreen("Login");
+        setError("");
+        setCode("");
+        setPassword(newPassword.trim());
+      } catch (error) {
+        setError(String(error));
+        setLoader(false);
+      }
+    } else {
+      setError("Please enter same password");
+      setLoader(false);
+    }
+  };
   React.useEffect(() => {
     setError(null);
   }, [username, password]);
+  const toggleResetBtn = (allPassed) => {
+    setDisableSendBtn(!allPassed);
+  };
   return (
     <div style={style.background}>
       <Box sx={style.boxStyle}>
@@ -55,45 +114,138 @@ export default function LoginAws({
             </Grid>
             <Grid item xs={12} style={{ background: cardBgColor, padding: 20 }}>
               {error && <p style={style.errorMessage}>{error}</p>}
-              <form onSubmit={(e) => signInMethod(e)}>
-                <h4 style={style.labelHeadLogin}>
-                  Sign in with your email and password
-                </h4>
-                <p style={{ margin: 0 }}>Email</p>
-                <input
-                style={style.input}
-                  type="text"
-                  placeholder="Enter Email"
-                  value={username}
-                  disabled={loading}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-
-                <p style={{ margin: 0, paddingTop: 10 }}>Password</p>
-                <input
+              {screen === "Login" && (
+                <form onSubmit={(e) => signInMethod(e)}>
+                  <h4 style={style.labelHeadLogin}>
+                    Sign in with your email and password
+                  </h4>
+                  <p style={{ margin: 0 }}>Email</p>
+                  <input
                     style={style.input}
-                  type="password"
-                  placeholder="Enter Password"
-                  value={password}
-                  disabled={loading}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <span style={style.forgotPassword}>Forgot your password?</span>
-                <Button
-                  type="submit"
-                  style={{ backgroundColor: buttonBg, ...style.buttonStyle }}
-                  disabled={loading}
-                  onClick={(e) => signInMethod(e)}
-                >
-                  {!loading ? (
-                    "Sign In"
-                  ) : (
-                    <CircularProgress color="#fff" size="30px" />
-                  )}
-                </Button>
-              </form>
+                    type="text"
+                    placeholder="Enter Email"
+                    value={username}
+                    disabled={loading}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+
+                  <p style={{ margin: 0, paddingTop: 10 }}>Password</p>
+                  <input
+                    style={style.input}
+                    type="password"
+                    placeholder="Enter Password"
+                    value={password}
+                    disabled={loading}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <span
+                    style={style.forgotPassword}
+                    onClick={() => setScreen("Forgot")}
+                  >
+                    Forgot your password?
+                  </span>
+                  <Button
+                    type="submit"
+                    style={{ backgroundColor: buttonBg, ...style.buttonStyle }}
+                    disabled={loading}
+                    onClick={(e) => signInMethod(e)}
+                  >
+                    {!loading ? (
+                      "Sign In"
+                    ) : (
+                      <CircularProgress color="#fff" size="30px" />
+                    )}
+                  </Button>
+                </form>
+              )}
+              {screen === "Forgot" && (
+                <form onSubmit={(e) => resetPasswordMethod(e)}>
+                  <h3>Forgot your password?</h3>
+                  <h4 style={{ ...style.labelHeadLogin, fontSize: 13 }}>
+                    Enter your Email and we will send a message to reset your
+                    password.
+                  </h4>
+                  <p style={{ margin: 0 }}>Email</p>
+                  <input
+                    style={style.input}
+                    type="text"
+                    placeholder="Enter Email"
+                    value={username}
+                    disabled={loading}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                  <Button
+                    type="submit"
+                    style={{ backgroundColor: buttonBg, ...style.buttonStyle }}
+                    disabled={loading}
+                    onClick={(e) => resetPasswordMethod(e)}
+                  >
+                    {!loading ? (
+                      "RESET MY PASSWORD"
+                    ) : (
+                      <CircularProgress color="#fff" size="30px" />
+                    )}
+                  </Button>
+                </form>
+              )}
+              {screen === "OtpVerification" && (
+                <form onSubmit={(e) => handleConfirmVerification(e)}>
+                  <p>{message}</p>
+                  <br />
+                  <p style={{ margin: 0 }}>Code</p>
+                  <input
+                    style={style.input}
+                    type="number"
+                    placeholder="Code"
+                    value={code}
+                    disabled={loading}
+                    onChange={(e) => setCode(e.target.value)}
+                    required
+                  />
+                  <br />
+                  <p style={{ margin: 0 }}>New Password</p>
+                  <input
+                    style={style.input}
+                    type="password"
+                    placeholder="New Password"
+                    value={newPassword}
+                    disabled={loading}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                  />
+                  <br />
+                  <p style={{ margin: 0 }}>Confirm Password</p>
+                  <input
+                    style={style.input}
+                    type="password"
+                    placeholder="Confirm Password"
+                    value={confirmNewPassword}
+                    disabled={loading}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    required
+                  />
+                  <br />
+                  <Button
+                    type="submit"
+                    style={{ backgroundColor: buttonBg, ...style.buttonStyle }}
+                    disabled={loading || disableSendBtn}
+                    onClick={(e) => handleConfirmVerification(e)}
+                  >
+                    {!loading ? (
+                      "CHANGE PASSWORD"
+                    ) : (
+                      <CircularProgress color="#fff" size="30px" />
+                    )}
+                  </Button>
+                  <PasswordValidations
+                    password={newPassword}
+                    allPassed={toggleResetBtn}
+                  />
+                </form>
+              )}
             </Grid>
           </Grid>
         </Paper>
